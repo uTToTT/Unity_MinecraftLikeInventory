@@ -7,6 +7,5 @@ public class InventorySlot : MonoBehaviour, IDropHandler
     {
         var item = eventData.pointerDrag.transform;
         item.SetParent(transform);
-        item.localPosition = Vector3.zero;
     }
 }
