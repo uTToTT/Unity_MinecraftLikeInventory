@@ -51,6 +51,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ec35ec8ee63b7142beb7621cb1930ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InventoryItem
+  _item: {fileID: 11400000, guid: 62a1b6b8c66df264ba62ac690fc2466b, type: 2}
+  _controller: {fileID: 0}
+  _quantityText: {fileID: 5362596783387227828}
+  _quantity: 0
 --- !u!225 &5756403733116382686
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -61,7 +65,7 @@ CanvasGroup:
   m_Enabled: 1
   m_Alpha: 1
   m_Interactable: 1
-  m_BlocksRaycasts: 1
+  m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
 --- !u!1 &6829365983409669340
 GameObject:

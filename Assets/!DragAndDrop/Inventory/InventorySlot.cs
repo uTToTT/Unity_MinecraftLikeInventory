@@ -7,20 +7,22 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     [SerializeField] private Image _highlight;
     [SerializeField] private RectTransform _itemContainer;
 
-    private RectTransform _rectTransform;
     private InventoryController _inventoryController;
 
-    public void Init(InventoryController controller) => _inventoryController = controller;
+    public InventoryItem ContainedItem;
 
-    private void Start()
-    {
-        _rectTransform = GetComponent<RectTransform>();
-    }
+    public void Init(InventoryController controller) => _inventoryController = controller;
 
     public void PutItem(InventoryItem item)
     {
         item.Rect.SetParent(_itemContainer);
         item.Rect.localPosition = Vector3.zero;
+        ContainedItem = item;
+    }
+
+    public void RemoveItem()
+    {
+        ContainedItem = null;
     }
 
     public void OnPointerEnter(PointerEventData eventData)
@@ -37,6 +39,6 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        _inventoryController.OnSlotClick(this);
+        _inventoryController.OnSlotClick(this, eventData);
     }
 }

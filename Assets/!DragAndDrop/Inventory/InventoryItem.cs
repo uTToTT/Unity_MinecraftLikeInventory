@@ -1,46 +1,58 @@
-using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class InventoryItem : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler, IPointerClickHandler
+public class InventoryItem : MonoBehaviour, IPointerClickHandler
 {
-    //public event Action<RectTransform, PointerEventData> BeginDrag;
-    //public event Action<RectTransform, PointerEventData> Drag;
-    //public event Action<RectTransform, PointerEventData> EndDrag;
-
+    [SerializeField] private ItemSO _item;
     [SerializeField] private InventoryController _controller; // tmp
+    [SerializeField] private TMP_Text _quantityText;
+    [SerializeField] private int _quantity;
 
     private RectTransform _rectTransform;
     private CanvasGroup _canvasGroup;
 
     public RectTransform Rect => _rectTransform;
     public CanvasGroup CanvasGroup => _canvasGroup;
+    public ItemSO Item => _item;
 
-    private void Start()
+    private void Awake()
     {
         _rectTransform = GetComponent<RectTransform>();
         _canvasGroup = GetComponent<CanvasGroup>();
     }
 
-    public void OnBeginDrag(PointerEventData eventData)
+    public void Init(InventoryController controller)
     {
-        //_controller.OnItemBeginDragHandler(_rectTransform, eventData);
-        //_canvasGroup.blocksRaycasts = false;
+        _controller = controller;
     }
 
-    public void OnDrag(PointerEventData eventData)
-    {
-        //_controller.OnItemDragHandler(_rectTransform, eventData);
-    }
+    public int GetQuantity() => _quantity;
 
-    public void OnEndDrag(PointerEventData eventData)
+    public void SetQuantity(int amount)
     {
-        //_controller.OnItemEndDragHandler(_rectTransform, eventData);
-        //_canvasGroup.blocksRaycasts = true;
+        if (amount <= 0)
+            throw new System.ArgumentException("Quantity must be greater than zero!");
+
+        _quantity = amount;
+
+        if (amount > 1)
+            _quantityText.text = amount.ToString();
+        else
+            _quantityText.text = string.Empty;
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        _controller.OnItemClickHandler(this, eventData);
+        switch (eventData.button)
+        {
+            case PointerEventData.InputButton.Left:
+                _controller.OnItemClickHandler(this, eventData);
+                break;
+            case PointerEventData.InputButton.Right:
+                break;
+            default:
+                break;
+        }
     }
 }

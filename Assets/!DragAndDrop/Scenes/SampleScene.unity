@@ -2649,7 +2649,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.4811321, g: 0.4811321, b: 0.4811321, a: 1}
+  m_Color: {r: 0.45, g: 0.45, b: 0.45, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -4701,6 +4701,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47cc39b1123100e429e9924b6d565d6b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InventoryController
+  _itemPrefab: {fileID: 3045677660803046794, guid: db25e6fb3f81ad9489dbf50c9aef32af, type: 3}
   _slotsParent: {fileID: 1183659623}
   _inventoryParent: {fileID: 737994979}
   _canvas: {fileID: 566447901}
@@ -5154,12 +5155,20 @@ PrefabInstance:
     m_TransformParent: {fileID: 7233057483207371848}
     m_Modifications:
     - target: {fileID: 3045677660803046794, guid: db25e6fb3f81ad9489dbf50c9aef32af, type: 3}
+      propertyPath: _quantity
+      value: 64
+      objectReference: {fileID: 0}
+    - target: {fileID: 3045677660803046794, guid: db25e6fb3f81ad9489dbf50c9aef32af, type: 3}
       propertyPath: _controller
       value: 
       objectReference: {fileID: 1820673832}
     - target: {fileID: 3136496004031019161, guid: db25e6fb3f81ad9489dbf50c9aef32af, type: 3}
       propertyPath: m_Name
       value: InventoryItem
+      objectReference: {fileID: 0}
+    - target: {fileID: 5756403733116382686, guid: db25e6fb3f81ad9489dbf50c9aef32af, type: 3}
+      propertyPath: m_BlocksRaycasts
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7697747981868547840, guid: db25e6fb3f81ad9489dbf50c9aef32af, type: 3}
       propertyPath: m_Pivot.x

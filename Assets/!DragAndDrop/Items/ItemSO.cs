@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ItemSO : ScriptableObject
+public abstract class ItemSO : ScriptableObject
 {
     [Header("Base info")]
     public string ID;
