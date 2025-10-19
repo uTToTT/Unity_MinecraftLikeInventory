@@ -1,0 +1,35 @@
+{
+    "version": 1,
+    "name": "PlayerInput",
+    "maps": [
+        {
+            "name": "UI",
+            "id": "65f01843-9e4f-4afe-8668-08a799872ec8",
+            "actions": [
+                {
+                    "name": "Pointer",
+                    "type": "Value",
+                    "id": "a1f62e48-113e-454f-b537-b881c9a3df4d",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "ab62d569-e02a-45ca-91f6-17d654415a9d",
+                    "path": "<Mouse>/position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Pointer",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}

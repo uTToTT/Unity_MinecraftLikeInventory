@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class InventoryItem : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler
+public class InventoryItem : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler, IPointerClickHandler
 {
     //public event Action<RectTransform, PointerEventData> BeginDrag;
     //public event Action<RectTransform, PointerEventData> Drag;
@@ -13,6 +13,9 @@ public class InventoryItem : MonoBehaviour, IDragHandler, IBeginDragHandler, IEn
     private RectTransform _rectTransform;
     private CanvasGroup _canvasGroup;
 
+    public RectTransform Rect => _rectTransform;
+    public CanvasGroup CanvasGroup => _canvasGroup;
+
     private void Start()
     {
         _rectTransform = GetComponent<RectTransform>();
@@ -21,18 +24,23 @@ public class InventoryItem : MonoBehaviour, IDragHandler, IBeginDragHandler, IEn
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        _controller.OnItemBeginDragHandler(_rectTransform, eventData);
-        _canvasGroup.blocksRaycasts = false;
+        //_controller.OnItemBeginDragHandler(_rectTransform, eventData);
+        //_canvasGroup.blocksRaycasts = false;
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        _controller.OnItemDragHandler(_rectTransform, eventData);
+        //_controller.OnItemDragHandler(_rectTransform, eventData);
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        _controller.OnItemEndDragHandler(_rectTransform, eventData);
-        _canvasGroup.blocksRaycasts = true;
+        //_controller.OnItemEndDragHandler(_rectTransform, eventData);
+        //_canvasGroup.blocksRaycasts = true;
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        _controller.OnItemClickHandler(this, eventData);
     }
 }

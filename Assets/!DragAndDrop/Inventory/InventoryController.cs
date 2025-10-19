@@ -4,18 +4,24 @@ using UnityEngine.EventSystems;
 
 public class InventoryController : MonoBehaviour
 {
-    [SerializeField] private float _moveSpeed = 5f;
     [SerializeField] private Transform _slotsParent;
+    [SerializeField] private Transform _inventoryParent;
     [SerializeField] private Canvas _canvas;
     private readonly List<InventorySlot> _slots = new();
 
-    private RectTransform _rectItem;
-    private Vector3 _targetPosition;
-    private bool _isMoving;
+
+    private bool _isItemSelected;
+    private InventoryItem _selectedItem;
+    private InventorySlot _selectedSlot;
 
     public void Init()
     {
         _slots.AddRange(_slotsParent.GetComponentsInChildren<InventorySlot>());
+
+        foreach (var slot in _slots)
+        {
+            slot.Init(this);
+        }
     }
 
     #region ==== Unity API ====
@@ -27,16 +33,13 @@ public class InventoryController : MonoBehaviour
 
     private void Update()
     {
-        if (_isMoving)
-        {
-            _rectItem.MoveTowards(_targetPosition, _moveSpeed);
+        if (!_isItemSelected || _selectedItem == null) return;
 
-            if (_rectItem.IsReach(_targetPosition))
-            {
-                _rectItem.localPosition = Vector3.zero;
-                _isMoving = false;
-            }
-        }
+        var rawPos = InputManager.Instance.Handler.GetPointerPosition();
+        var worldPos = InputManager.Instance.PointerService.ScreenToWorld(rawPos);
+
+
+        _selectedItem.Rect.position = worldPos;
     }
 
     #endregion
@@ -59,6 +62,8 @@ public class InventoryController : MonoBehaviour
 
     #region ==== Handlers ====
 
+    // Items
+
     public void OnItemBeginDragHandler(RectTransform rect, PointerEventData eventData)
     {
         var slot = rect.parent;
@@ -75,12 +80,52 @@ public class InventoryController : MonoBehaviour
         MoveToPosition(rect, rect.parent.position);
     }
 
+    public void OnItemClickHandler(InventoryItem item, PointerEventData eventData)
+    {
+        _isItemSelected = true;
+
+        _selectedItem = item;
+        _selectedItem.Rect.SetParent(_inventoryParent);
+        _selectedItem.Rect.SetAsLastSibling();
+        _selectedItem.CanvasGroup.blocksRaycasts = false;
+
+        if (_isItemSelected)
+        {
+
+        }
+        else
+        {
+
+        }
+    }
+
+    // Slots
+
+    public void OnSlotEnter(InventorySlot slot)
+    {
+        _selectedSlot = slot;
+    }
+
+    public void OnSlotExit(InventorySlot slot)
+    {
+        _selectedSlot = null;
+    }
+
+    public void OnSlotClick(InventorySlot slot)
+    {
+        if (_isItemSelected)
+        {
+            _selectedSlot.PutItem(_selectedItem);
+            _selectedItem.CanvasGroup.blocksRaycasts = true;
+            _selectedItem = null;
+            _isItemSelected = false;
+        }
+    }
+
     #endregion
 
     private void MoveToPosition(RectTransform rect, Vector3 pos)
     {
-        _rectItem = rect;   
-        _targetPosition = pos;
-        _isMoving = true;
+        rect.position = pos;
     }
 }
