@@ -31,7 +31,6 @@ public class InventoryController : MonoBehaviour, IDisposable
 
         foreach (var slot in _slots)
         {
-            Debug.Log(i);
             slot.SlotPointerEnter += OnSlotEnter;
             slot.SlotPointerExit += OnSlotExit;
             slot.SetIndex(i++);
@@ -58,7 +57,6 @@ public class InventoryController : MonoBehaviour, IDisposable
 
         var rawPos = InputManager.Instance.Handler.GetPointerPosition();
         var worldPos = InputManager.Instance.PointerService.ScreenToWorld(rawPos);
-
         _selectedStack.Rect.position = worldPos;
     }
 
@@ -66,10 +64,26 @@ public class InventoryController : MonoBehaviour, IDisposable
 
     public bool AddItem(ItemSO item, int amount = 1)
     {
+        if (!TryGetSameNotCompleteSlot(item.ID, out var notCompleteSlot))
+        {
+            Debug.Log("Not found same slot.");
+        }
+
         if (!TryGetFirstEmptySlot(out var emptySlot))
         {
             Debug.Log("All slots are full!");
             return false;
+        }
+
+
+        if (notCompleteSlot != null)
+        {
+            amount = FillStack(item, amount, notCompleteSlot.GetStack());
+
+            if (amount <= 0)
+            {
+                return true;
+            }
         }
 
         var newStack = Instantiate(_stackPrefab, _canvas.transform);
@@ -78,7 +92,13 @@ public class InventoryController : MonoBehaviour, IDisposable
 
         _stacks.Add(newStack);
 
+        if (!_stackMap.ContainsKey(item.ID))
+        {
+            _stackMap[item.ID] = new List<InventorySlot>();
+        }
+
         emptySlot.AddStack(newStack);
+        _stackMap[item.ID].Add(emptySlot);
         return true;
     }
 
@@ -94,23 +114,6 @@ public class InventoryController : MonoBehaviour, IDisposable
 
     #region ==== Handlers ====
 
-    // Items
-
-    public void OnItemClickHandler(InventoryStack item, PointerEventData eventData)
-    {
-        _selectedStack = item;
-        _selectedStack.Rect.SetParent(_inventoryParent);
-        _selectedStack.Rect.SetAsLastSibling();
-        _selectedSlot.RemoveStack();
-
-        if (!_stacks.Contains(item))
-        {
-            _stacks.Add(item);
-        }
-    }
-
-    // Slots
-
     public void OnSlotEnter(InventorySlot slot, PointerEventData eventData)
     {
         _selectedSlot = slot;
@@ -123,27 +126,6 @@ public class InventoryController : MonoBehaviour, IDisposable
         _selectedSlotMarker.position = _markerNullPosition;
     }
 
-    public void OnSlotClick(InventorySlot slot, PointerEventData eventData)
-    {
-        return;
-        if (_selectedStack != null)
-        {
-            switch (eventData.button)
-            {
-                case PointerEventData.InputButton.Left:
-                    PutItemStackToSlot();
-                    break;
-
-                case PointerEventData.InputButton.Right:
-                    PutItemToSlot();
-                    break;
-
-                default:
-                    break;
-            }
-        }
-    }
-
     #endregion
 
     private void OnClick()
@@ -152,30 +134,112 @@ public class InventoryController : MonoBehaviour, IDisposable
             _selectedStack == null &&
             _selectedSlot.HasStack())
         {
-            _selectedStack = _selectedSlot.GetStack();
-            _selectedStack.Rect.SetParent(_inventoryParent);
-            _selectedStack.Rect.SetAsLastSibling();
-
-            _selectedSlot.RemoveStack();
+            SelectStackFromSlot(_selectedSlot.GetStack(), _selectedSlot);
             return;
         }
 
         if (_selectedStack != null &&
             _selectedSlot != null)
         {
+
             if (_selectedSlot.HasStack())
             {
                 var stackInSlot = _selectedSlot.GetStack();
-                stackInSlot.SetQuantity(stackInSlot.GetQuantity() + _selectedStack.GetQuantity());
-                Destroy(_selectedStack.gameObject);
+
+                if (stackInSlot.ItemID == _selectedStack.ItemID &&
+                    stackInSlot.IsFull == false)
+                {
+                    FillStack(_selectedStack, stackInSlot);
+                }
+                else
+                {
+                    InventoryStack tmp = _selectedStack;
+                    SelectStackFromSlot(stackInSlot, _selectedSlot);
+                    AddStackToSlot(_selectedSlot, tmp);
+                }
             }
             else
             {
-                _selectedSlot.AddStack(_selectedStack);
+                AddStackToSlot(_selectedSlot, _selectedStack);
+                _selectedStack = null;
             }
 
-            _selectedStack = null;
             return;
+        }
+    }
+
+    private void SelectStackFromSlot(InventoryStack stack, InventorySlot slot)
+    {
+        _selectedStack = stack;
+        _selectedStack.Rect.SetParent(_inventoryParent);
+        _selectedStack.Rect.SetAsLastSibling();
+
+        _stackMap[_selectedStack.ItemID].Remove(slot);
+
+        slot.RemoveStack();
+    }
+
+    private void AddStackToSlot(InventorySlot slot, InventoryStack stack)
+    {
+        slot.AddStack(stack);
+        _stackMap[stack.ItemID].Add(slot);
+    }
+
+    private void SwapStack(InventoryStack from, InventoryStack to)
+    {
+        InventoryStack tmp;
+
+        tmp = from;
+        from = to;
+        to = tmp;
+
+        Debug.Log("Swaped");
+    }
+
+    private void FillStack(InventoryStack from, InventoryStack to)
+    {
+        if (from.ItemID != to.ItemID)
+        {
+            Debug.LogWarning("Different items.");
+            return;
+        }
+
+        var amountFrom = from.GetQuantity();
+        var amountTo = to.GetQuantity();
+        var amountAll = amountFrom + amountTo;
+
+        if (amountAll <= to.MaxStack)
+        {
+            to.SetQuantity(amountAll);
+            Destroy(from.gameObject);
+        }
+        else
+        {
+            to.SetQuantity(to.MaxStack);
+            from.SetQuantity(amountAll - to.MaxStack);
+        }
+    }
+
+    private int FillStack(ItemSO item, int amountFrom, InventoryStack to)
+    {
+        if (item.ID != to.ItemID)
+        {
+            Debug.LogWarning("Different items.");
+            return -1;
+        }
+
+        var amountTo = to.GetQuantity();
+        var amountAll = amountFrom + amountTo;
+
+        if (amountAll <= to.MaxStack)
+        {
+            to.SetQuantity(amountAll);
+            return 0;
+        }
+        else
+        {
+            to.SetQuantity(to.MaxStack);
+            return amountAll - to.MaxStack;
         }
     }
 
@@ -183,63 +247,19 @@ public class InventoryController : MonoBehaviour, IDisposable
     {
         slot = null;
 
+        if (_stackMap.TryGetValue(itemID, out var slots))
+        {
+            slot = slots.FirstOrDefault(s => s.GetStack().IsFull == false);
+            return true;
+        }
+
         return false;
     }
 
     private bool TryGetFirstEmptySlot(out InventorySlot slot)
     {
-        slot = _slots.FirstOrDefault(x => !x.HasStack());
+        slot = _slots.FirstOrDefault(s => !s.HasStack());
 
         return slot != null;
-    }
-
-    private void PutItemStackToSlot()
-    {
-        _selectedSlot.AddStack(_selectedStack);
-        _selectedStack = null;
-    }
-
-    private void PutItemToSlot()
-    {
-        if (_selectedSlot.GetStack() == null)
-        {
-            var newStack = Instantiate(_stackPrefab);
-            _selectedSlot.AddStack(newStack);
-            newStack.transform.localScale = Vector3.one;
-            newStack.SetQuantity(1);
-
-
-            _stacks.Add(newStack);
-            var resQuantity = _selectedStack.GetQuantity() - 1;
-
-            if (resQuantity <= 0)
-            {
-                DeleteSelectedStack();
-                return;
-            }
-
-            _selectedStack.SetQuantity(resQuantity);
-        }
-        else
-        {
-            _selectedSlot.GetStack().SetQuantity(_selectedSlot.GetStack().GetQuantity() + 1);
-
-            var resQuantity = _selectedStack.GetQuantity() - 1;
-
-            if (resQuantity <= 0)
-            {
-                DeleteSelectedStack();
-                return;
-            }
-
-            _selectedStack.SetQuantity(resQuantity);
-        }
-    }
-
-    private void DeleteSelectedStack()
-    {
-        _stacks.Remove(_selectedStack);
-        Destroy(_selectedStack.gameObject);
-        _selectedStack = null;
     }
 }

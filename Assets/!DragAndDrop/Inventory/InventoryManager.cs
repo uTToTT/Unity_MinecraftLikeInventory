@@ -12,7 +12,7 @@ public class InventoryManager : MonoBehaviour
     }
 
     public void AddCoal() => AddItem(_coal);
-    public void AddIron() => AddItem(_iron);
+    public void AddIron() => AddItem(_iron, 48);
 
-    private void AddItem(ItemSO item) => _controller.AddItem(item);
+    private void AddItem(ItemSO item, int amount = 1) => _controller.AddItem(item, amount);
 }

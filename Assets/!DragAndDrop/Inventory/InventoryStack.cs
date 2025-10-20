@@ -12,7 +12,9 @@ public class InventoryStack : MonoBehaviour
     private RectTransform _rectTransform;
 
     public RectTransform Rect => _rectTransform;
-    public ItemSO Item => _item;
+    public bool IsFull => _quantity >= _item.MaxStack;
+    public int MaxStack => _item.MaxStack;
+    public string ItemID => _item.ID;
 
     public void Init(ItemSO item)
     {
