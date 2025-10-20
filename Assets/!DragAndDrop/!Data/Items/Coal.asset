@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ResourceItemSO
   ID: item.resource.coal
   DisplayName: Coal
-  Icon: {fileID: 0}
+  Icon: {fileID: 8678828216298306154, guid: feb7abd0cfdcdf14cb72284d92f2061f, type: 3}
   IsStackable: 1
   MaxStack: 64

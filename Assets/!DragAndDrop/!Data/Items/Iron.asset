@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ResourceItemSO
   ID: item.resource.iron
   DisplayName: Iron
-  Icon: {fileID: 0}
+  Icon: {fileID: -3340087763479825054, guid: bb701da2572a3db44801d7a8b8213259, type: 3}
   IsStackable: 1
   MaxStack: 64

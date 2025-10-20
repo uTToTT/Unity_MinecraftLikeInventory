@@ -1,44 +1,48 @@
+using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
+public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
+    public event Action<InventorySlot, PointerEventData> SlotPointerEnter;
+    public event Action<InventorySlot, PointerEventData> SlotPointerExit;
+
     [SerializeField] private Image _highlight;
     [SerializeField] private RectTransform _itemContainer;
+    [SerializeField] private TMP_Text _index;
 
-    private InventoryController _inventoryController;
+    private InventoryStack _containedStack;
 
-    public InventoryItem ContainedItem;
+    public void SetIndex(int index) => _index.text = index.ToString();
 
-    public void Init(InventoryController controller) => _inventoryController = controller;
+    public bool HasStack() => _containedStack != null;
+    public void RemoveStack() => _containedStack = null;
+    public InventoryStack GetStack() => _containedStack;
 
-    public void PutItem(InventoryItem item)
+    public void AddStack(InventoryStack item)
     {
+        if (HasStack()) Debug.LogWarning("Already contain stack.");
+
         item.Rect.SetParent(_itemContainer);
         item.Rect.localPosition = Vector3.zero;
-        ContainedItem = item;
+        _containedStack = item;
     }
 
-    public void RemoveItem()
-    {
-        ContainedItem = null;
-    }
+    #region ==== Handlers ====
 
     public void OnPointerEnter(PointerEventData eventData)
     {
         _highlight.enabled = true;
-        _inventoryController.OnSlotEnter(this);
+        SlotPointerEnter?.Invoke(this, eventData);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         _highlight.enabled = false;
-        _inventoryController.OnSlotExit(this);
+        SlotPointerExit?.Invoke(this, eventData);
     }
 
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        _inventoryController.OnSlotClick(this, eventData);
-    }
+    #endregion
 }

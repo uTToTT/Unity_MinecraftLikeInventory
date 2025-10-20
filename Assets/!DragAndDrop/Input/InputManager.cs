@@ -8,6 +8,7 @@ public class InputManager : MonoBehaviour
 
     public IInputHandler Handler { get; private set; }
     public PointerService PointerService { get; private set; }
+
     public void Init()
     {
         Instance = this;
@@ -15,10 +16,5 @@ public class InputManager : MonoBehaviour
         PointerService = new PointerService(_camera);
 
         Handler.EnableInput();
-    }
-
-    private void Start()
-    {
-        Init();
     }
 }

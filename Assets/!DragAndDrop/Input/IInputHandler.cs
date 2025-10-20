@@ -1,7 +1,10 @@
+using System;
 using UnityEngine;
 
-public interface IInputHandler 
+public interface IInputHandler : IDisposable
 {
+    event Action LMBClick;
+
     void EnableInput();
     void DisableInput();
 
