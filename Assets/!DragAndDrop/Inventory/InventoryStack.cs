@@ -15,6 +15,7 @@ public class InventoryStack : MonoBehaviour
     public bool IsFull => _quantity >= _item.MaxStack;
     public int MaxStack => _item.MaxStack;
     public string ItemID => _item.ID;
+    public ItemSO Item => _item;
 
     public void Init(ItemSO item)
     {
@@ -26,7 +27,6 @@ public class InventoryStack : MonoBehaviour
     {
         _rectTransform = GetComponent<RectTransform>();
     }
-
     public int GetQuantity() => _quantity;
 
     public void SetQuantity(int amount)

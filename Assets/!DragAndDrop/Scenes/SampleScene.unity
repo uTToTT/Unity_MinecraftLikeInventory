@@ -477,7 +477,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Coal +1
+  m_text: Coal +16
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -740,19 +740,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 217241564}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 275160811}
-        m_TargetAssemblyTypeName: InventoryManager, Assembly-CSharp
-        m_MethodName: AddCoal
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &217241564
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1041,7 +1029,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::InventoryManager
   _controller: {fileID: 1820673832}
   _coal: {fileID: 11400000, guid: 62a1b6b8c66df264ba62ac690fc2466b, type: 2}
+  _amountCoal: 16
+  _addCoalButton: {fileID: 217241563}
   _iron: {fileID: 11400000, guid: edfa18ec977fd5c48b923e1961d1d310, type: 2}
+  _amountIron: 6
+  _addIronButton: {fileID: 699290976}
 --- !u!1001 &364239385
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1904,19 +1896,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 699290977}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 275160811}
-        m_TargetAssemblyTypeName: InventoryManager, Assembly-CSharp
-        m_MethodName: AddIron
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &699290977
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2423,7 +2403,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Iron +1
+  m_text: Iron +6
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
