@@ -1,8 +1,9 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class InventoryStack : MonoBehaviour
+public class InventoryStack : MonoBehaviour, IDisposable
 {
     [SerializeField] private TMP_Text _quantityText;
     [SerializeField] private int _quantity;
@@ -11,8 +12,9 @@ public class InventoryStack : MonoBehaviour
     private ItemSO _item;
     private RectTransform _rectTransform;
 
+    public bool IsDestroyed { get; private set; }
+
     public RectTransform Rect => _rectTransform;
-    public bool IsFull => _quantity >= _item.MaxStack;
     public int MaxStack => _item.MaxStack;
     public string ItemID => _item.ID;
     public ItemSO Item => _item;
@@ -21,12 +23,15 @@ public class InventoryStack : MonoBehaviour
     {
         _item = item;
         _icon.sprite = item.Icon;
+        IsDestroyed = false;
     }
 
     private void Awake()
     {
         _rectTransform = GetComponent<RectTransform>();
     }
+    public bool IsFull() => _quantity >= _item.MaxStack;
+    public bool IsEmpty() => _quantity >= _item.MaxStack;
     public int GetQuantity() => _quantity;
 
     public void SetQuantity(int amount)
@@ -39,5 +44,10 @@ public class InventoryStack : MonoBehaviour
         string quantityText = amount > 1 ? amount.ToString() : string.Empty;
 
         _quantityText.text = quantityText;
+    }
+
+    public void Dispose()
+    {
+        IsDestroyed = true;
     }
 }

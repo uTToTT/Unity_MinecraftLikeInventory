@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -8,6 +9,8 @@ using Mathf = UnityEngine.Mathf;
 
 public class InventoryController : MonoBehaviour, IDisposable
 {
+    private const float CLICK_TRESHOLD = 0.5f;
+
     [Header("Debug")]
     [SerializeField] private Vector3 _markerNullPosition;
     [SerializeField] private RectTransform _selectedSlotMarker;
@@ -19,10 +22,12 @@ public class InventoryController : MonoBehaviour, IDisposable
 
     private readonly List<InventorySlot> _slots = new();
     private readonly List<InventoryStack> _stacks = new();
-    private readonly Dictionary<string, List<InventorySlot>> _stackMap = new();
+    private readonly Dictionary<string, List<InventoryStack>> _stackMap = new();
 
     private InventoryStack _selectedStack;
     private InventorySlot _selectedSlot;
+
+    private float _doubleClickTimer;
 
     private void OnDragLMB() => Debug.Log("Drag LMB");
     private void OnDragRMB() => Debug.Log("Drag RMB");
@@ -61,6 +66,11 @@ public class InventoryController : MonoBehaviour, IDisposable
 
     private void Update()
     {
+        if (_doubleClickTimer > 0)
+        {
+            _doubleClickTimer -= Time.deltaTime;
+        }
+
         if (_selectedStack == null) return;
 
         var rawPos = InputManager.Instance.Handler.GetPointerPosition();
@@ -72,7 +82,7 @@ public class InventoryController : MonoBehaviour, IDisposable
 
     public bool AddItem(ItemSO item, int amount = 1)
     {
-        if (!TryGetSameNotCompleteSlot(item.ID, out var notCompleteSlot))
+        if (!TryGetSameNotCompleteStack(item.ID, out var notCompleteStack))
         {
             Debug.Log("Not found same slot.");
         }
@@ -84,9 +94,9 @@ public class InventoryController : MonoBehaviour, IDisposable
         }
 
 
-        if (notCompleteSlot != null)
+        if (notCompleteStack != null)
         {
-            amount = FillStack(item, amount, notCompleteSlot.GetStack());
+            amount = FillStack(item, amount, notCompleteStack);
 
             if (amount <= 0)
             {
@@ -97,7 +107,7 @@ public class InventoryController : MonoBehaviour, IDisposable
         var newStack = CreateStack(item, amount);
 
         emptySlot.AddStack(newStack);
-        _stackMap[item.ID].Add(emptySlot);
+        _stackMap[item.ID].Add(newStack);
         return true;
     }
 
@@ -129,6 +139,36 @@ public class InventoryController : MonoBehaviour, IDisposable
 
     private void OnLMBClick()
     {
+        if (_selectedStack == null)
+        {
+            _doubleClickTimer = CLICK_TRESHOLD;
+        }
+
+
+        if (_doubleClickTimer > 0 &&
+            _selectedStack != null)
+        {
+            Debug.Log("Double click");
+            var selectedStackQuantity = _selectedStack.GetQuantity();
+
+            if (selectedStackQuantity >= _selectedStack.MaxStack) return;
+
+
+            if (_stackMap.TryGetValue(_selectedStack.ItemID, out var stacks) == false)
+                return;
+
+            for (int i = 0; i < stacks.Count; i++) // ref
+            {
+                var stack = stacks.FirstOrDefault(s => s.IsDestroyed == false && s != _selectedStack);
+
+                FillStack(stack, _selectedStack);
+
+                if (_selectedStack.IsFull()) return;
+            }
+
+            return;
+        }
+
         if (_selectedSlot != null &&
             _selectedStack == null &&
             _selectedSlot.HasStack())
@@ -146,7 +186,7 @@ public class InventoryController : MonoBehaviour, IDisposable
                 var stackInSlot = _selectedSlot.GetStack();
 
                 if (stackInSlot.ItemID == _selectedStack.ItemID &&
-                    stackInSlot.IsFull == false)
+                    stackInSlot.IsFull() == false)
                 {
                     FillStack(_selectedStack, stackInSlot);
                 }
@@ -163,6 +203,7 @@ public class InventoryController : MonoBehaviour, IDisposable
 
             return;
         }
+
     }
 
     private void OnRMBClick()
@@ -218,7 +259,7 @@ public class InventoryController : MonoBehaviour, IDisposable
                 }
                 else
                 {
-                    Destroy(_selectedStack.gameObject);
+                    DestroyStack(_selectedStack);
                 }
             }
         }
@@ -230,15 +271,15 @@ public class InventoryController : MonoBehaviour, IDisposable
         _selectedStack.Rect.SetParent(_inventoryParent);
         _selectedStack.Rect.SetAsLastSibling();
 
-        _stackMap[_selectedStack.ItemID].Remove(slot);
+        _stackMap[_selectedStack.ItemID].Remove(stack);
 
         slot.RemoveStack();
     }
 
     private void AddStackToSlot(InventoryStack stack, InventorySlot slot)
     {
+        _stackMap[stack.ItemID].Add(stack);
         slot.AddStack(stack);
-        _stackMap[stack.ItemID].Add(slot);
     }
 
     private void SwapStack(InventoryStack from, InventoryStack to, InventorySlot inSlot)
@@ -250,6 +291,13 @@ public class InventoryController : MonoBehaviour, IDisposable
 
     private void FillStack(InventoryStack from, InventoryStack to, int fillAmount = -1)
     {
+        if (from == null || from.IsDestroyed || 
+            to == null || to.IsDestroyed)
+        {
+            Debug.LogWarning("Stack already destroyed.");
+            return;
+        }
+
         if (from.ItemID != to.ItemID)
         {
             Debug.LogWarning("Different items.");
@@ -265,7 +313,7 @@ public class InventoryController : MonoBehaviour, IDisposable
             if (amountAll <= to.MaxStack)
             {
                 to.SetQuantity(amountAll);
-                Destroy(from.gameObject);
+                DestroyStack(from);
             }
             else
             {
@@ -280,7 +328,7 @@ public class InventoryController : MonoBehaviour, IDisposable
                 var fill = Mathf.Min(amountFrom, fillAmount);
 
                 to.SetQuantity(amountTo + fill);
-                Destroy(from.gameObject);
+                DestroyStack(from);
             }
             else
             {
@@ -315,13 +363,26 @@ public class InventoryController : MonoBehaviour, IDisposable
         }
     }
 
-    private bool TryGetSameNotCompleteSlot(string itemID, out InventorySlot slot)
-    {
-        slot = null;
+    //private bool TryGetSameSlot(string itemID, out InventorySlot slot)
+    //{
+    //    slot = null;
 
-        if (_stackMap.TryGetValue(itemID, out var slots))
+    //    if (_stackMap.TryGetValue(itemID, out var slots))
+    //    {
+    //        slot = slots.FirstOrDefault();
+    //        return true;
+    //    }
+
+    //    return false;
+    //}
+
+    private bool TryGetSameNotCompleteStack(string itemID, out InventoryStack stack)
+    {
+        stack = null;
+
+        if (_stackMap.TryGetValue(itemID, out var stacks))
         {
-            slot = slots.FirstOrDefault(s => s.GetStack().IsFull == false);
+            stack = stacks.FirstOrDefault(s => s.IsFull() == false);
             return true;
         }
 
@@ -345,9 +406,18 @@ public class InventoryController : MonoBehaviour, IDisposable
 
         if (!_stackMap.ContainsKey(item.ID))
         {
-            _stackMap[item.ID] = new List<InventorySlot>();
+            _stackMap[item.ID] = new List<InventoryStack>();
         }
 
+        _stackMap[item.ID].Add(newStack);
+
         return newStack;
+    }
+
+    private void DestroyStack(InventoryStack stack)
+    {
+        stack.Dispose();
+        _stackMap[stack.ItemID].Remove(stack);
+        Destroy(stack.gameObject);
     }
 }
