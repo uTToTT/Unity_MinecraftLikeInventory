@@ -3,10 +3,11 @@ using UnityEngine;
 
 public interface IInputHandler : IDisposable
 {
-    event Action LMBClick;
-    event Action RMBClick;
-    event Action HoldRMB;
-    event Action HoldLMB;
+    event Action LMBClickUp;
+    event Action RMBClickUp;
+
+    event Action RMBClickDown;
+    event Action LMBClickDown;
 
     void EnableInput();
     void DisableInput();

@@ -4,10 +4,11 @@ using UnityEngine.InputSystem;
 
 public class PlayerInputHandler : IInputHandler
 {
-    public event Action LMBClick;
-    public event Action RMBClick;
-    public event Action HoldRMB;
-    public event Action HoldLMB;
+    public event Action LMBClickUp;
+    public event Action RMBClickUp;
+
+    public event Action RMBClickDown;
+    public event Action LMBClickDown;
 
     private PlayerInput _input;
 
@@ -31,32 +32,41 @@ public class PlayerInputHandler : IInputHandler
     }
 
     public Vector2 GetPointerPosition() => _input.UI.Pointer.ReadValue<Vector2>();
-    public void OnLMBClickPerformed(InputAction.CallbackContext context) => LMBClick?.Invoke();
-    public void OnRMBClickPerformed(InputAction.CallbackContext context) => RMBClick?.Invoke();
-    public void OnHoldLMBPerformed(InputAction.CallbackContext context) => HoldLMB?.Invoke();
-    public void OnHoldRMBPerformed(InputAction.CallbackContext context) => HoldRMB?.Invoke();
+
+
 
     public void Dispose()
     {
         UnsubOnEvents();
     }
 
+    #region ==== Handlers ====
+
+    private void OnLMBClickUp(InputAction.CallbackContext context) => LMBClickUp?.Invoke();
+    private void OnRMBClickUp(InputAction.CallbackContext context) => RMBClickUp?.Invoke();
+    private void OnLMBClickDown(InputAction.CallbackContext context) => LMBClickDown?.Invoke();
+    private void OnRMBClickDown(InputAction.CallbackContext context) => RMBClickDown?.Invoke();
+
+    #endregion ===============
+
     #region ==== Sub ====
 
     private void SubOnEvents()
     {
-        _input.UI.LMBClick.performed += OnLMBClickPerformed;
-        _input.UI.RMBClick.performed += OnRMBClickPerformed;
-        _input.UI.HoldLMB.performed += OnHoldLMBPerformed;
-        _input.UI.HoldRMB.performed += OnHoldRMBPerformed;
+        _input.UI.LMBClick.started += OnLMBClickDown;
+        _input.UI.LMBClick.canceled += OnLMBClickUp;
+
+        _input.UI.RMBClick.started += OnRMBClickDown;
+        _input.UI.RMBClick.canceled += OnRMBClickUp;
     }
 
     private void UnsubOnEvents()
     {
-        _input.UI.LMBClick.performed -= OnLMBClickPerformed;
-        _input.UI.RMBClick.performed -= OnRMBClickPerformed;
-        _input.UI.HoldLMB.performed -= OnHoldLMBPerformed;
-        _input.UI.HoldRMB.performed -= OnHoldRMBPerformed;
+        _input.UI.LMBClick.started -= OnLMBClickDown;
+        _input.UI.LMBClick.canceled -= OnLMBClickUp;
+
+        _input.UI.RMBClick.started -= OnRMBClickDown;
+        _input.UI.RMBClick.canceled -= OnRMBClickUp;
     }
 
     #endregion

@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 public class InventoryStack : MonoBehaviour, IDisposable
 {
+    public event Action<InventoryStack> OnEmpty;
+
     [SerializeField] private TMP_Text _quantityText;
     [SerializeField] private int _quantity;
     [SerializeField] private Image _icon;
@@ -36,14 +38,16 @@ public class InventoryStack : MonoBehaviour, IDisposable
 
     public void SetQuantity(int amount)
     {
+        _quantity = Mathf.Clamp(amount, 0, MaxStack);
+        UpdateVisual();
+
         if (amount <= 0)
-            throw new System.ArgumentException("Quantity must be greater than zero!");
+            OnEmpty?.Invoke(this);
+    }
 
-        _quantity = amount;
-
-        string quantityText = amount > 1 ? amount.ToString() : string.Empty;
-
-        _quantityText.text = quantityText;
+    private void UpdateVisual()
+    {
+        _quantityText.text = _quantity > 1 ? _quantity.ToString() : string.Empty;
     }
 
     public void Dispose()

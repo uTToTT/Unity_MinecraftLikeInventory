@@ -118,24 +118,6 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""HoldLMB"",
-                    ""type"": ""Button"",
-                    ""id"": ""8256c8c6-db36-42c5-92b8-4b2e2cd13327"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": ""Hold(duration=0.1,pressPoint=0.1)"",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""HoldRMB"",
-                    ""type"": ""Button"",
-                    ""id"": ""3e5cf06d-b96b-432e-8f1c-b55088e531bd"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": ""Hold(duration=0.1,pressPoint=0.1)"",
-                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -171,28 +153,6 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""action"": ""RMBClick"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""6f13d098-1b81-42c6-bfea-154ce6f376c4"",
-                    ""path"": ""<Mouse>/rightButton"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""HoldRMB"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""8410aa5c-b76f-480e-b1a4-a276a0075868"",
-                    ""path"": ""<Mouse>/leftButton"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""HoldLMB"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -204,8 +164,6 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         m_UI_Pointer = m_UI.FindAction("Pointer", throwIfNotFound: true);
         m_UI_LMBClick = m_UI.FindAction("LMBClick", throwIfNotFound: true);
         m_UI_RMBClick = m_UI.FindAction("RMBClick", throwIfNotFound: true);
-        m_UI_HoldLMB = m_UI.FindAction("HoldLMB", throwIfNotFound: true);
-        m_UI_HoldRMB = m_UI.FindAction("HoldRMB", throwIfNotFound: true);
     }
 
     ~@PlayerInput()
@@ -289,8 +247,6 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_UI_Pointer;
     private readonly InputAction m_UI_LMBClick;
     private readonly InputAction m_UI_RMBClick;
-    private readonly InputAction m_UI_HoldLMB;
-    private readonly InputAction m_UI_HoldRMB;
     /// <summary>
     /// Provides access to input actions defined in input action map "UI".
     /// </summary>
@@ -314,14 +270,6 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "UI/RMBClick".
         /// </summary>
         public InputAction @RMBClick => m_Wrapper.m_UI_RMBClick;
-        /// <summary>
-        /// Provides access to the underlying input action "UI/HoldLMB".
-        /// </summary>
-        public InputAction @HoldLMB => m_Wrapper.m_UI_HoldLMB;
-        /// <summary>
-        /// Provides access to the underlying input action "UI/HoldRMB".
-        /// </summary>
-        public InputAction @HoldRMB => m_Wrapper.m_UI_HoldRMB;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -357,12 +305,6 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @RMBClick.started += instance.OnRMBClick;
             @RMBClick.performed += instance.OnRMBClick;
             @RMBClick.canceled += instance.OnRMBClick;
-            @HoldLMB.started += instance.OnHoldLMB;
-            @HoldLMB.performed += instance.OnHoldLMB;
-            @HoldLMB.canceled += instance.OnHoldLMB;
-            @HoldRMB.started += instance.OnHoldRMB;
-            @HoldRMB.performed += instance.OnHoldRMB;
-            @HoldRMB.canceled += instance.OnHoldRMB;
         }
 
         /// <summary>
@@ -383,12 +325,6 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @RMBClick.started -= instance.OnRMBClick;
             @RMBClick.performed -= instance.OnRMBClick;
             @RMBClick.canceled -= instance.OnRMBClick;
-            @HoldLMB.started -= instance.OnHoldLMB;
-            @HoldLMB.performed -= instance.OnHoldLMB;
-            @HoldLMB.canceled -= instance.OnHoldLMB;
-            @HoldRMB.started -= instance.OnHoldRMB;
-            @HoldRMB.performed -= instance.OnHoldRMB;
-            @HoldRMB.canceled -= instance.OnHoldRMB;
         }
 
         /// <summary>
@@ -450,19 +386,5 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnRMBClick(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "HoldLMB" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnHoldLMB(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "HoldRMB" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnHoldRMB(InputAction.CallbackContext context);
     }
 }
