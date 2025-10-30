@@ -21,6 +21,8 @@ public class InventoryStack : MonoBehaviour, IDisposable
     public string ItemID => _item.ID;
     public ItemSO Item => _item;
 
+    #region ==== Init ====
+
     public void Init(ItemSO item)
     {
         _item = item;
@@ -28,10 +30,17 @@ public class InventoryStack : MonoBehaviour, IDisposable
         IsDestroyed = false;
     }
 
+    #endregion
+
+    #region ==== Unity API ====
+
     private void Awake()
     {
         _rectTransform = GetComponent<RectTransform>();
     }
+
+    #endregion
+
     public bool IsFull() => _quantity >= _item.MaxStack;
     public bool IsEmpty() => _quantity >= _item.MaxStack;
     public int GetQuantity() => _quantity;

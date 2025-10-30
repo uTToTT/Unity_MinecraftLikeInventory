@@ -139,7 +139,7 @@ public class InventoryController : MonoBehaviour, IDisposable
 
         if (notCompleteStack != null)
         {
-            amount = FillStack(item, amount, notCompleteStack);
+            amount = FillStack(notCompleteStack, amount);
 
             if (amount <= 0)
             {
@@ -206,7 +206,7 @@ public class InventoryController : MonoBehaviour, IDisposable
 
     #endregion
 
-    private void OnLMBClickUp()
+    private void OnLMBClickUp() // ref
     {
         OnDragLMBCancaled();
 
@@ -217,7 +217,8 @@ public class InventoryController : MonoBehaviour, IDisposable
 
 
         if (_doubleClickTimer > 0 &&
-            _selectedStack != null)
+            _selectedStack != null &&
+            _selectedStack.IsDestroyed == false)
         {
             var selectedStackQuantity = _selectedStack.GetQuantity();
 
@@ -233,7 +234,13 @@ public class InventoryController : MonoBehaviour, IDisposable
             {
                 var stack = stacks.FirstOrDefault(s => s.IsDestroyed == false && s != _selectedStack);
 
-                FillStack(stack, _selectedStack);
+                if (stack == null || stack.IsDestroyed)
+                {
+                    continue;
+                }
+
+                int extra = FillStack(_selectedStack, stack.GetQuantity());
+                stack.SetQuantity(extra);
 
                 if (_selectedStack.IsFull()) return;
             }
@@ -250,6 +257,7 @@ public class InventoryController : MonoBehaviour, IDisposable
         }
 
         if (_selectedStack != null &&
+            _selectedStack.IsDestroyed == false &&
             _selectedSlot != null)
         {
 
@@ -260,7 +268,8 @@ public class InventoryController : MonoBehaviour, IDisposable
                 if (stackInSlot.ItemID == _selectedStack.ItemID &&
                     stackInSlot.IsFull() == false)
                 {
-                    FillStack(_selectedStack, stackInSlot);
+                    int extra = FillStack(stackInSlot, _selectedStack.GetQuantity());
+                    _selectedStack.SetQuantity(extra);
                 }
                 else
                 {
@@ -278,7 +287,7 @@ public class InventoryController : MonoBehaviour, IDisposable
 
     }
 
-    private void OnRMBClickUp()
+    private void OnRMBClickUp() // ref
     {
         OnDragRMBCancaled();
 
@@ -315,12 +324,15 @@ public class InventoryController : MonoBehaviour, IDisposable
         }
 
         if (_selectedSlot != null &&
-            _selectedStack != null)
+            _selectedStack != null &&
+            _selectedStack.IsDestroyed == false)
         {
             if (_selectedSlot.HasStack())
             {
                 var stackInSlot = _selectedSlot.GetStack();
-                FillStack(_selectedStack, stackInSlot, 1);
+
+                FillStack(stackInSlot, 1);
+                _selectedStack.SetQuantity(_selectedStack.GetQuantity() - 1);
             }
             else
             {
@@ -339,7 +351,7 @@ public class InventoryController : MonoBehaviour, IDisposable
         }
     }
 
-    private void DivideEquallyStacks(HashSet<InventorySlot> slots, InventoryStack stack) // ref
+    private void DivideEquallyStacks(HashSet<InventorySlot> slots, InventoryStack stack) // ref // error
     {
         //if (slots.Count <= 1) return;
 
@@ -397,78 +409,25 @@ public class InventoryController : MonoBehaviour, IDisposable
         AddStackToSlot(tmp, inSlot);
     }
 
-    private void FillStack(InventoryStack from, InventoryStack to, int fillAmount = -1)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="stack"></param>
+    /// <param name="amount"></param>
+    /// <returns>Extra</returns>
+    private int FillStack(InventoryStack stack, int amount)
     {
-        if (from == null || from.IsDestroyed ||
-            to == null || to.IsDestroyed)
-        {
-            Debug.LogWarning("Stack already destroyed.");
-            return;
-        }
-
-        if (from.ItemID != to.ItemID)
-        {
-            Debug.LogWarning("Different items.");
-            return;
-        }
-
-        var amountFrom = from.GetQuantity();
-        var amountTo = to.GetQuantity();
-        var amountAll = amountFrom + amountTo;
-
-        if (fillAmount < 0)
-        {
-            if (amountAll <= to.MaxStack)
-            {
-                to.SetQuantity(amountAll);
-                DestroyStack(from);
-            }
-            else
-            {
-                to.SetQuantity(to.MaxStack);
-                from.SetQuantity(amountAll - to.MaxStack);
-            }
-        }
-        else
-        {
-            if (fillAmount >= amountFrom)
-            {
-                var fill = Mathf.Min(amountFrom, fillAmount);
-
-                to.SetQuantity(amountTo + fill);
-                DestroyStack(from);
-            }
-            else
-            {
-                to.SetQuantity(amountTo + fillAmount);
-
-                amountFrom = amountFrom - fillAmount;
-                from.SetQuantity(amountFrom);
-            }
-        }
-    }
-
-    private int FillStack(ItemSO item, int amountFrom, InventoryStack to) // ref
-    {
-        if (item.ID != to.ItemID)
-        {
-            Debug.LogWarning("Different items.");
-            return -1;
-        }
-
-        var amountTo = to.GetQuantity();
-        var amountAll = amountFrom + amountTo;
-
-        if (amountAll <= to.MaxStack)
-        {
-            to.SetQuantity(amountAll);
+        if (stack == null)
+            throw new ArgumentNullException(nameof(stack));
+        if (amount <= 0)
             return 0;
-        }
-        else
-        {
-            to.SetQuantity(to.MaxStack);
-            return amountAll - to.MaxStack;
-        }
+
+        int total = stack.GetQuantity() + amount;
+        int clamped = Mathf.Min(total, stack.MaxStack);
+
+        stack.SetQuantity(clamped);
+
+        return Mathf.Max(0, total - stack.MaxStack);
     }
 
     private bool TryGetSameNotCompleteStack(string itemID, out InventoryStack stack)
