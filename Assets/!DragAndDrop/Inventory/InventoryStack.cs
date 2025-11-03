@@ -12,11 +12,10 @@ public class InventoryStack : MonoBehaviour, IDisposable
     [SerializeField] private Image _icon;
 
     private ItemSO _item;
-    private RectTransform _rectTransform;
 
     public bool IsDestroyed { get; private set; }
+    public RectTransform Rect { get; private set; }
 
-    public RectTransform Rect => _rectTransform;
     public int MaxStack => _item.MaxStack;
     public string ItemID => _item.ID;
     public ItemSO Item => _item;
@@ -30,19 +29,24 @@ public class InventoryStack : MonoBehaviour, IDisposable
         IsDestroyed = false;
     }
 
+    public void Dispose()
+    {
+        IsDestroyed = true;
+    }
+
     #endregion
 
     #region ==== Unity API ====
 
     private void Awake()
     {
-        _rectTransform = GetComponent<RectTransform>();
+        Rect = GetComponent<RectTransform>();
     }
 
     #endregion
 
     public bool IsFull() => _quantity >= _item.MaxStack;
-    public bool IsEmpty() => _quantity >= _item.MaxStack;
+    public bool IsEmpty() => _quantity <= 0;
     public int GetQuantity() => _quantity;
 
     public void SetQuantity(int amount)
@@ -57,10 +61,5 @@ public class InventoryStack : MonoBehaviour, IDisposable
     private void UpdateVisual()
     {
         _quantityText.text = _quantity > 1 ? _quantity.ToString() : string.Empty;
-    }
-
-    public void Dispose()
-    {
-        IsDestroyed = true;
     }
 }

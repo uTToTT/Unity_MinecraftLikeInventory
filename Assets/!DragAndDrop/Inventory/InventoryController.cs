@@ -23,7 +23,6 @@ public class InventoryController : MonoBehaviour, IDisposable
 
     private readonly HashSet<InventorySlot> _onLMBDragSelectedSlots = new();
     private readonly HashSet<InventorySlot> _onRMBDragSelectedSlots = new();
-    private readonly HashSet<InventorySlot> _emptyStacksBuffer = new();
 
     private InventoryStack _selectedStack;
     private InventorySlot _selectedSlot;
@@ -34,46 +33,7 @@ public class InventoryController : MonoBehaviour, IDisposable
 
     private int _stackQuantityBuffer;
 
-    private void OnDragLMBCancaled()
-    {
-        Debug.Log("Drag LMB cancaled");
-        _onLMBDrag = false;
-        _onLMBDragSelectedSlots.Clear();
-    }
 
-    private void OnDragRMBCancaled()
-    {
-        Debug.Log("Drag RMB cancaled");
-        _onRMBDrag = false;
-        _onRMBDragSelectedSlots.Clear();
-    }
-
-    private void OnLMBDown()
-    {
-        Debug.Log("Drag LMB perf");
-        _onLMBDrag = true;
-
-        if (_selectedStack != null &&
-            _selectedStack.IsDestroyed == false)
-        {
-            _stackQuantityBuffer = _selectedStack.GetQuantity();
-
-            if (_onLMBDragSelectedSlots.Add(_selectedSlot) == false) return;
-
-        }
-    }
-
-    private void OnRMBDown()
-    {
-        Debug.Log("Drag RMB perf");
-        _onRMBDrag = true;
-
-        if (_selectedStack != null &&
-            _selectedStack.IsDestroyed == false)
-        {
-            _stackQuantityBuffer = _selectedStack.GetQuantity();
-        }
-    }
 
     public void Init()
     {
@@ -161,7 +121,11 @@ public class InventoryController : MonoBehaviour, IDisposable
 
     public bool HasItem(ItemSO item, int amount = 1)
     {
-        return false;
+        bool has = false;
+
+
+
+        return has;
     }
 
     #region ==== Handlers ====
@@ -204,7 +168,42 @@ public class InventoryController : MonoBehaviour, IDisposable
         _selectedSlot = null;
     }
 
-    #endregion
+    private void OnDragLMBCancaled()
+    {
+        _onLMBDrag = false;
+        _onLMBDragSelectedSlots.Clear();
+    }
+
+    private void OnDragRMBCancaled()
+    {
+        _onRMBDrag = false;
+        _onRMBDragSelectedSlots.Clear();
+    }
+
+    private void OnLMBDown()
+    {
+        _onLMBDrag = true;
+
+        if (_selectedStack != null &&
+            _selectedStack.IsDestroyed == false)
+        {
+            _stackQuantityBuffer = _selectedStack.GetQuantity();
+
+            if (_onLMBDragSelectedSlots.Add(_selectedSlot) == false) return;
+
+        }
+    }
+
+    private void OnRMBDown()
+    {
+        _onRMBDrag = true;
+
+        if (_selectedStack != null &&
+            _selectedStack.IsDestroyed == false)
+        {
+            _stackQuantityBuffer = _selectedStack.GetQuantity();
+        }
+    }
 
     private void OnLMBClickUp() // ref
     {
@@ -351,6 +350,8 @@ public class InventoryController : MonoBehaviour, IDisposable
         }
     }
 
+    #endregion
+
     private void DivideEquallyStacks(HashSet<InventorySlot> slots, InventoryStack stack) // ref // error
     {
         //if (slots.Count <= 1) return;
@@ -398,7 +399,11 @@ public class InventoryController : MonoBehaviour, IDisposable
 
     private void AddStackToSlot(InventoryStack stack, InventorySlot slot)
     {
-        _stackMap[stack.ItemID].Add(stack);
+        if (_stackMap[stack.ItemID] != null &&
+            _stackMap[stack.ItemID].Contains(stack) == false)
+        {
+            _stackMap[stack.ItemID].Add(stack);
+        }
         slot.AddStack(stack);
     }
 
@@ -408,6 +413,10 @@ public class InventoryController : MonoBehaviour, IDisposable
         SelectStackFromSlot(to, inSlot);
         AddStackToSlot(tmp, inSlot);
     }
+
+
+
+    #region ==== Stack control ====
 
     /// <summary>
     /// 
@@ -430,6 +439,10 @@ public class InventoryController : MonoBehaviour, IDisposable
         return Mathf.Max(0, total - stack.MaxStack);
     }
 
+    #endregion
+
+    #region ==== Get stack ====
+
     private bool TryGetSameNotCompleteStack(string itemID, out InventoryStack stack)
     {
         stack = null;
@@ -437,10 +450,9 @@ public class InventoryController : MonoBehaviour, IDisposable
         if (_stackMap.TryGetValue(itemID, out var stacks))
         {
             stack = stacks.FirstOrDefault(s => s.IsFull() == false);
-            return true;
         }
 
-        return false;
+        return stack != null;
     }
 
     private bool TryGetFirstEmptySlot(out InventorySlot slot)
@@ -450,20 +462,23 @@ public class InventoryController : MonoBehaviour, IDisposable
         return slot != null;
     }
 
+    #endregion
+
+    #region ==== Stack factory ====
+
     private InventoryStack CreateStack(ItemSO item, int amount = 1)
     {
-        var newStack = Instantiate(_stackPrefab, _canvas.transform);
+        var newStack = Instantiate(_stackPrefab, _canvas.transform); // ref
         newStack.Init(item);
         newStack.OnEmpty += OnStackEmpty;
         newStack.SetQuantity(amount);
 
-        _stacks.Add(newStack);
-
-        if (!_stackMap.ContainsKey(item.ID))
+        if (_stackMap.ContainsKey(item.ID) == false)
         {
             _stackMap[item.ID] = new List<InventoryStack>();
         }
 
+        _stacks.Add(newStack);
         _stackMap[item.ID].Add(newStack);
 
         return newStack;
@@ -471,9 +486,15 @@ public class InventoryController : MonoBehaviour, IDisposable
 
     private void DestroyStack(InventoryStack stack)
     {
+        if (_stackMap.ContainsKey(stack.ItemID) == false)
+            throw new ArgumentException(nameof(stack.ItemID));
+
         stack.Dispose();
+
+        _stacks.Remove(stack);
         _stackMap[stack.ItemID].Remove(stack);
-        Destroy(stack.gameObject);
+
+        Destroy(stack.gameObject); // ref
     }
 
 
@@ -481,4 +502,6 @@ public class InventoryController : MonoBehaviour, IDisposable
     {
         DestroyStack(stack);
     }
+
+    #endregion
 }
