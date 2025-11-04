@@ -34,6 +34,12 @@ public class InventoryController : MonoBehaviour, IDisposable
     private int _stackQuantityBuffer;
 
 
+    public bool IsStackSelected() => IsStackSelected(_selectedStack);
+    public bool IsStackSelected(InventoryStack stack) => stack != null && stack.IsDestroyed == false;
+    public bool IsSlotSelected() => IsSlotSelected(_selectedSlot);
+    public bool IsSlotSelected(InventorySlot slot) => slot != null;
+    public bool IsSlotHasStack() => IsSlotHasStack(_selectedSlot);
+    public bool IsSlotHasStack(InventorySlot slot) => slot != null && slot.HasStack();
 
     public void Init()
     {
@@ -134,8 +140,7 @@ public class InventoryController : MonoBehaviour, IDisposable
     {
         _selectedSlot = slot;
 
-        if (_selectedStack != null &&
-            _selectedStack.IsDestroyed == false)
+        if (IsStackSelected())
         {
             var stackInSlot = slot.GetStack();
             var stackInSlotQuantity = stackInSlot?.GetQuantity();
@@ -184,8 +189,7 @@ public class InventoryController : MonoBehaviour, IDisposable
     {
         _onLMBDrag = true;
 
-        if (_selectedStack != null &&
-            _selectedStack.IsDestroyed == false)
+        if (IsStackSelected())
         {
             _stackQuantityBuffer = _selectedStack.GetQuantity();
 
@@ -198,8 +202,7 @@ public class InventoryController : MonoBehaviour, IDisposable
     {
         _onRMBDrag = true;
 
-        if (_selectedStack != null &&
-            _selectedStack.IsDestroyed == false)
+        if (IsStackSelected())
         {
             _stackQuantityBuffer = _selectedStack.GetQuantity();
         }
@@ -209,15 +212,13 @@ public class InventoryController : MonoBehaviour, IDisposable
     {
         OnDragLMBCancaled();
 
-        if (_selectedStack == null)
+        if (IsStackSelected() == false)
         {
             _doubleClickTimer = CLICK_TRESHOLD;
         }
 
 
-        if (_doubleClickTimer > 0 &&
-            _selectedStack != null &&
-            _selectedStack.IsDestroyed == false)
+        if (_doubleClickTimer > 0 && IsStackSelected())
         {
             var selectedStackQuantity = _selectedStack.GetQuantity();
 
@@ -247,20 +248,19 @@ public class InventoryController : MonoBehaviour, IDisposable
             return;
         }
 
-        if (_selectedSlot != null &&
-            _selectedStack == null &&
-            _selectedSlot.HasStack())
+        if (IsSlotSelected() &&
+            IsStackSelected() == false &&
+            IsSlotHasStack())
         {
             SelectStackFromSlot(_selectedSlot.GetStack(), _selectedSlot);
             return;
         }
 
-        if (_selectedStack != null &&
-            _selectedStack.IsDestroyed == false &&
-            _selectedSlot != null)
+        if (IsStackSelected() &&
+            IsSlotSelected())
         {
 
-            if (_selectedSlot.HasStack())
+            if (IsSlotHasStack())
             {
                 var stackInSlot = _selectedSlot.GetStack();
 
@@ -290,9 +290,8 @@ public class InventoryController : MonoBehaviour, IDisposable
     {
         OnDragRMBCancaled();
 
-        if (_selectedSlot != null &&
-            _selectedSlot.HasStack() &&
-            _selectedStack == null)
+        if (IsSlotHasStack() &&
+            IsStackSelected() == false)
         {
             var stackInSlot = _selectedSlot.GetStack();
             var stackInSlotQuanity = stackInSlot.GetQuantity();
@@ -322,11 +321,10 @@ public class InventoryController : MonoBehaviour, IDisposable
             return;
         }
 
-        if (_selectedSlot != null &&
-            _selectedStack != null &&
-            _selectedStack.IsDestroyed == false)
+        if (IsSlotSelected() &&
+            IsStackSelected())
         {
-            if (_selectedSlot.HasStack())
+            if (IsSlotHasStack())
             {
                 var stackInSlot = _selectedSlot.GetStack();
 
