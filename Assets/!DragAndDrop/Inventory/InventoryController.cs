@@ -220,17 +220,12 @@ public class InventoryController : MonoBehaviour, IDisposable
 
         if (_doubleClickTimer > 0 && IsStackSelected())
         {
-            var selectedStackQuantity = _selectedStack.GetQuantity();
-
-            if (selectedStackQuantity >= _selectedStack.MaxStack) return;
-
+            if (_selectedStack.GetQuantity() >= _selectedStack.MaxStack) return;
 
             if (_stackMap.TryGetValue(_selectedStack.ItemID, out var stacks) == false)
                 return;
 
-            var stacksCount = stacks.Count;
-
-            for (int i = 0; i < stacksCount; i++) // ref
+            for (int i = 0; i < stacks.Count; i++) // ref
             {
                 var stack = stacks.FirstOrDefault(s => s.IsDestroyed == false && s != _selectedStack);
 
@@ -259,31 +254,29 @@ public class InventoryController : MonoBehaviour, IDisposable
         if (IsStackSelected() &&
             IsSlotSelected())
         {
-
-            if (IsSlotHasStack())
-            {
-                var stackInSlot = _selectedSlot.GetStack();
-
-                if (stackInSlot.ItemID == _selectedStack.ItemID &&
-                    stackInSlot.IsFull() == false)
-                {
-                    int extra = FillStack(stackInSlot, _selectedStack.GetQuantity());
-                    _selectedStack.SetQuantity(extra);
-                }
-                else
-                {
-                    SwapStack(_selectedStack, stackInSlot, _selectedSlot);
-                }
-            }
-            else
-            {
-                AddStackToSlot(_selectedStack, _selectedSlot);
-                _selectedStack = null;
-            }
+            AddStackToSlot(_selectedStack, _selectedSlot);
+            _selectedStack = null;
 
             return;
         }
 
+        if (IsStackSelected() &&
+            IsSlotSelected() &&
+            IsSlotHasStack())
+        {
+            var stackInSlot = _selectedSlot.GetStack();
+
+            if (stackInSlot.ItemID == _selectedStack.ItemID &&
+                stackInSlot.IsFull() == false)
+            {
+                int extra = FillStack(stackInSlot, _selectedStack.GetQuantity());
+                _selectedStack.SetQuantity(extra);
+            }
+            else
+            {
+                SwapStack(_selectedStack, stackInSlot, _selectedSlot);
+            }
+        }
     }
 
     private void OnRMBClickUp() // ref
@@ -324,27 +317,27 @@ public class InventoryController : MonoBehaviour, IDisposable
         if (IsSlotSelected() &&
             IsStackSelected())
         {
-            if (IsSlotHasStack())
-            {
-                var stackInSlot = _selectedSlot.GetStack();
+            var newStack = CreateStack(_selectedStack.Item);
+            var selectedStackAmount = _selectedStack.GetQuantity();
 
-                FillStack(stackInSlot, 1);
-                _selectedStack.SetQuantity(_selectedStack.GetQuantity() - 1);
+            _selectedSlot.AddStack(newStack);
+
+            if (selectedStackAmount > 1)
+            {
+                _selectedStack.SetQuantity(selectedStackAmount - 1);
             }
             else
             {
-                var newStack = CreateStack(_selectedStack.Item);
-                _selectedSlot.AddStack(newStack);
-                var selectedStackAmount = _selectedStack.GetQuantity();
-                if (selectedStackAmount > 1)
-                {
-                    _selectedStack.SetQuantity(selectedStackAmount - 1);
-                }
-                else
-                {
-                    DestroyStack(_selectedStack);
-                }
+                DestroyStack(_selectedStack);
             }
+        }
+
+        if (IsSlotSelected() &&
+            IsStackSelected() &&
+            IsSlotHasStack())
+        {
+            FillStack(_selectedSlot.GetStack(), 1);
+            _selectedStack.SetQuantity(_selectedStack.GetQuantity() - 1);
         }
     }
 
