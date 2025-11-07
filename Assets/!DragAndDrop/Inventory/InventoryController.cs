@@ -247,12 +247,13 @@ public class InventoryController : MonoBehaviour, IDisposable
             IsStackSelected() == false &&
             IsSlotHasStack())
         {
-            SelectStackFromSlot(_selectedSlot.GetStack(), _selectedSlot);
+            SelectStackFromSlot(_selectedSlot);
             return;
         }
 
         if (IsStackSelected() &&
-            IsSlotSelected())
+            IsSlotSelected() &&
+            IsSlotHasStack() == false)
         {
             AddStackToSlot(_selectedStack, _selectedSlot);
             _selectedStack = null;
@@ -271,73 +272,63 @@ public class InventoryController : MonoBehaviour, IDisposable
             {
                 int extra = FillStack(stackInSlot, _selectedStack.GetQuantity());
                 _selectedStack.SetQuantity(extra);
+
+                return;
             }
             else
             {
-                SwapStack(_selectedStack, stackInSlot, _selectedSlot);
+                SwapStack(_selectedStack, _selectedSlot);
+                return;
             }
         }
     }
 
-    private void OnRMBClickUp() // ref
+    private void OnRMBClickUp() 
     {
         OnDragRMBCancaled();
 
-        if (IsSlotHasStack() &&
-            IsStackSelected() == false)
+        if (IsStackSelected() == false &&
+            IsSlotSelected() &&
+            IsSlotHasStack())
         {
-            var stackInSlot = _selectedSlot.GetStack();
-            var stackInSlotQuanity = stackInSlot.GetQuantity();
+            var stack = _selectedSlot.GetStack();
+            var total = _selectedSlot.GetStack().GetQuantity();
 
-            if (stackInSlotQuanity <= 1)
+            if (total <= 1)
             {
-                SelectStackFromSlot(stackInSlot, _selectedSlot);
+                SelectStackFromSlot(_selectedSlot);
                 return;
             }
 
-            bool isPairAmount = stackInSlotQuanity % 2 == 0;
-            var halfAmountInStack = stackInSlotQuanity / 2;
+            var half = total / 2;
+            int newStackAmount = (total % 2 == 0) ? half : half + 1;
 
-            int stackInSlotNewAmount = halfAmountInStack;
-            int newStackNewAmount = halfAmountInStack;
+            var newStack = CreateStack(stack.Item, newStackAmount);
+            SelectStack(newStack);
 
-            if (!isPairAmount)
-            {
-                newStackNewAmount += 1;
-            }
-
-            var newStack = CreateStack(stackInSlot.Item, newStackNewAmount);
-            _selectedStack = newStack;
-
-            stackInSlot.SetQuantity(stackInSlotNewAmount);
+            stack.SetQuantity(half);
 
             return;
         }
 
-        if (IsSlotSelected() &&
-            IsStackSelected())
+        if (IsStackSelected() &&
+            IsSlotSelected() &&
+            IsSlotHasStack() == false)
         {
-            var newStack = CreateStack(_selectedStack.Item);
-            var selectedStackAmount = _selectedStack.GetQuantity();
+            _selectedSlot.AddStack(CreateStack(_selectedStack.Item));
+            _selectedStack.SetQuantity(_selectedStack.GetQuantity() - 1);
 
-            _selectedSlot.AddStack(newStack);
-
-            if (selectedStackAmount > 1)
-            {
-                _selectedStack.SetQuantity(selectedStackAmount - 1);
-            }
-            else
-            {
-                DestroyStack(_selectedStack);
-            }
+            return;
         }
 
-        if (IsSlotSelected() &&
-            IsStackSelected() &&
+        if (IsStackSelected() &&
+            IsSlotSelected() &&
             IsSlotHasStack())
         {
             FillStack(_selectedSlot.GetStack(), 1);
             _selectedStack.SetQuantity(_selectedStack.GetQuantity() - 1);
+
+            return;
         }
     }
 
@@ -381,8 +372,9 @@ public class InventoryController : MonoBehaviour, IDisposable
         _stackMap[_selectedStack.ItemID].Remove(stack);
     }
 
-    private void SelectStackFromSlot(InventoryStack stack, InventorySlot slot)
+    private void SelectStackFromSlot(InventorySlot slot)
     {
+        var stack = slot.GetStack();
         SelectStack(stack);
 
         slot.RemoveStack();
@@ -398,11 +390,10 @@ public class InventoryController : MonoBehaviour, IDisposable
         slot.AddStack(stack);
     }
 
-    private void SwapStack(InventoryStack from, InventoryStack to, InventorySlot inSlot)
+    private void SwapStack(InventoryStack from, InventorySlot inSlot)
     {
-        InventoryStack tmp = from;
-        SelectStackFromSlot(to, inSlot);
-        AddStackToSlot(tmp, inSlot);
+        SelectStackFromSlot(inSlot);
+        AddStackToSlot(from, inSlot);
     }
 
 
