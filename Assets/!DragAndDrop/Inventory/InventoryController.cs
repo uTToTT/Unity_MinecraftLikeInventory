@@ -225,7 +225,7 @@ public class InventoryController : MonoBehaviour, IDisposable
             if (_stackMap.TryGetValue(_selectedStack.ItemID, out var stacks) == false)
                 return;
 
-            for (int i = 0; i < stacks.Count; i++) // ref
+            for (int i = stacks.Count; i >= 0; i--) // ref
             {
                 var stack = stacks.FirstOrDefault(s => s.IsDestroyed == false && s != _selectedStack);
 
