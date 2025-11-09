@@ -214,6 +214,7 @@ public class InventoryController : MonoBehaviour, IDisposable
 
         if (IsStackSelected() == false)
         {
+
             _doubleClickTimer = CLICK_TRESHOLD;
         }
 
