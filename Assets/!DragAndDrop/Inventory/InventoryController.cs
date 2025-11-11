@@ -337,8 +337,6 @@ public class InventoryController : MonoBehaviour, IDisposable
 
     private void DivideEquallyStacks(HashSet<InventorySlot> slots, InventoryStack stack) // ref // error
     {
-        //if (slots.Count <= 1) return;
-
         var startStackQuantity = _stackQuantityBuffer;
 
         var stacksCount = slots.Count;
