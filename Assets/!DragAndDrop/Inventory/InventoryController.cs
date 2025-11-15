@@ -319,6 +319,7 @@ public class InventoryController : MonoBehaviour, IDisposable
             _selectedSlot.AddStack(CreateStack(_selectedStack.Item));
             _selectedStack.SetQuantity(_selectedStack.GetQuantity() - 1);
 
+
             return;
         }
 
