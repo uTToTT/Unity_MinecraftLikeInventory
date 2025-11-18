@@ -142,26 +142,14 @@ public class InventoryController : MonoBehaviour, IDisposable
 
         if (IsStackSelected())
         {
-            var stackInSlot = slot.GetStack();
-            var stackInSlotQuantity = stackInSlot?.GetQuantity();
-
             if (_onLMBDrag)
             {
-                if (stackInSlot == null ||
-                    stackInSlot.IsDestroyed)
+                if (IsSlotHasStack(slot) == false)
                 {
                     if (_onLMBDragSelectedSlots.Add(slot) == false) return;
 
                     DivideEquallyStacks(_onLMBDragSelectedSlots, _selectedStack);
                 }
-
-                return;
-            }
-
-            if (_onRMBDrag)
-            {
-                if (_onRMBDragSelectedSlots.Add(slot) == false) return;
-
 
                 return;
             }
@@ -284,7 +272,7 @@ public class InventoryController : MonoBehaviour, IDisposable
         }
     }
 
-    private void OnRMBClickUp() 
+    private void OnRMBClickUp()
     {
         OnDragRMBCancaled();
 
@@ -344,7 +332,6 @@ public class InventoryController : MonoBehaviour, IDisposable
         var equalQuantity = (int)(startStackQuantity / stacksCount);
         var k = startStackQuantity % stacksCount;
 
-        Debug.Log($"Equal: {equalQuantity}");
         foreach (var slot in slots)
         {
             var stackInSlot = slot.GetStack();
