@@ -6,7 +6,6 @@ public class InventoryManager : MonoBehaviour
 {
     [SerializeField] private InventoryController _controller;
 
-    // Only for test
     [Header("Coal")]
     [SerializeField] private ItemSO _coal;
     [Space]
@@ -18,7 +17,6 @@ public class InventoryManager : MonoBehaviour
     [Space]
     [SerializeField, Min(1)] private int _amountIron = 1;
     [SerializeField] private Button _addIronButton;
-    // =============
 
     public void Init()
     {
