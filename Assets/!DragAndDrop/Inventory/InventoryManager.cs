@@ -18,6 +18,8 @@ public class InventoryManager : MonoBehaviour
     [SerializeField, Min(1)] private int _amountIron = 1;
     [SerializeField] private Button _addIronButton;
 
+    #region ==== Init ====
+
     public void Init()
     {
         _controller.Init();
@@ -28,6 +30,8 @@ public class InventoryManager : MonoBehaviour
         _addCoalButton.onClick.AddListener(AddCoal);
         _addIronButton.onClick.AddListener(AddIron);
     }
+
+    #endregion ===========
 
     private void OnValidate()
     {
