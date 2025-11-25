@@ -41,10 +41,11 @@ public class InventoryManager : MonoBehaviour
 
     private void AddCoal() => AddItem(_coal, _amountCoal);
     private void AddIron() => AddItem(_iron, _amountIron);
-    private void SetText(Button button,string item, int amount)
+    private void SetText(Button button, string item, int amount)
     {
         var tmp = button.GetComponentInChildren<TMP_Text>();
-        tmp.text = $"{item} +{amount.ToString()}" ;
+        tmp.text = $"{item} +{amount.ToString()}";
+
     }
 
     private void AddItem(ItemSO item, int amount = 1) => _controller.AddItem(item, amount);
