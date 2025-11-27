@@ -93,12 +93,12 @@ public class InventoryController : MonoBehaviour, IDisposable
     {
         if (!TryGetSameNotCompleteStack(item.ID, out var notCompleteStack))
         {
-            Debug.Log("Not found same slot.");
+            //Debug.Log("Not found same slot.");
         }
 
         if (!TryGetFirstEmptySlot(out var emptySlot))
         {
-            Debug.Log("All slots are full!");
+            //Debug.Log("All slots are full!");
             return false;
         }
 
