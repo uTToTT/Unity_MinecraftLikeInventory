@@ -43,7 +43,8 @@ public class InventoryController : MonoBehaviour, IDisposable
 
     public void Init()
     {
-        _slots.AddRange(_slotsParent.GetComponentsInChildren<InventorySlot>());
+        _slots.AddRange(_slotsParent.GetComponentsInChildren<InventorySlot>()); 
+
         InputManager.Instance.Handler.LMBClickUp += OnLMBClickUp;
         InputManager.Instance.Handler.RMBClickUp += OnRMBClickUp;
         InputManager.Instance.Handler.LMBClickDown += OnLMBDown;
