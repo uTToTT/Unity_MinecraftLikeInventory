@@ -29,7 +29,7 @@ public class InventoryController : MonoBehaviour, IDisposable
 
     private float _doubleClickTimer;
     private bool _onLMBDrag;
-   
+    private bool _onRMBDrag;
 
     private int _stackQuantityBuffer;
 
