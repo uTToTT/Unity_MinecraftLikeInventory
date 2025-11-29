@@ -33,7 +33,6 @@ public class InventoryController : MonoBehaviour, IDisposable
 
     private int _stackQuantityBuffer;
 
-
     public bool IsStackSelected() => IsStackSelected(_selectedStack);
     public bool IsStackSelected(InventoryStack stack) => stack != null && stack.IsDestroyed == false;
     public bool IsSlotSelected() => IsSlotSelected(_selectedSlot);
@@ -43,7 +42,7 @@ public class InventoryController : MonoBehaviour, IDisposable
 
     public void Init()
     {
-        _slots.AddRange(_slotsParent.GetComponentsInChildren<InventorySlot>()); 
+        _slots.AddRange(_slotsParent.GetComponentsInChildren<InventorySlot>());
 
         InputManager.Instance.Handler.LMBClickUp += OnLMBClickUp;
         InputManager.Instance.Handler.RMBClickUp += OnRMBClickUp;
