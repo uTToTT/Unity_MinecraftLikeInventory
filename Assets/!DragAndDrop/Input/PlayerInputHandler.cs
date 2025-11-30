@@ -26,14 +26,10 @@ public class PlayerInputHandler : IInputHandler
 
     public void SwitchToUI()
     {
-        // disable other maps
-
         _input.UI.Enable();
     }
 
     public Vector2 GetPointerPosition() => _input.UI.Pointer.ReadValue<Vector2>();
-
-
 
     public void Dispose()
     {
