@@ -15,10 +15,8 @@ public static class TransformExtensions
     public static bool IsReach(this Transform target, Transform point) =>
         IsReach(target.position, point.position);
 
-    private static bool IsReach(Vector3 target, Vector3 point)
-    {
-        return (target - point).sqrMagnitude < DISTANCE_TO_REACH;
-    }
+    private static bool IsReach(Vector3 target, Vector3 point) =>
+        (target - point).sqrMagnitude < DISTANCE_TO_REACH;
 
     #endregion
 
