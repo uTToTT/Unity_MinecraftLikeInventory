@@ -46,6 +46,7 @@ public static class TransformExtensions
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
         movable.rotation = Quaternion.Euler(0f, 0f, angle - 90f);
     }
+
     public static void RotateAt2D(this Transform movable, Transform target, float rotationSpeed = 720f) =>
         RotateAt2D(movable, target.position, rotationSpeed);
 
