@@ -5,7 +5,6 @@ public interface IInputHandler : IDisposable
 {
     event Action LMBClickUp;
     event Action RMBClickUp;
-
     event Action RMBClickDown;
     event Action LMBClickDown;
 
