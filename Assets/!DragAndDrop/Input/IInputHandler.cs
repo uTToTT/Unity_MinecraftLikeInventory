@@ -8,6 +8,7 @@ public interface IInputHandler : IDisposable
     event Action RMBClickDown;
     event Action LMBClickDown;
 
+
     void EnableInput();
     void DisableInput();
 
