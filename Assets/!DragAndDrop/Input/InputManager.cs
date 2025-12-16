@@ -12,6 +12,7 @@ public class InputManager : MonoBehaviour
     public void Init()
     {
         Instance = this;
+        
         Handler = new PlayerInputHandler();
         PointerService = new PointerService(_camera);
 
