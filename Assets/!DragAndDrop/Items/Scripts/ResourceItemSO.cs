@@ -4,5 +4,4 @@ using UnityEngine;
 public class ResourceItemSO : ItemSO
 {
     public ItemType ItemType => ItemType.Resource;
-
 }
