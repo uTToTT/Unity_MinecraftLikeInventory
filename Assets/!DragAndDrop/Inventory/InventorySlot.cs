@@ -16,7 +16,6 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     private InventoryStack _containedStack;
 
     public void SetIndex(int index) => _index.text = index.ToString();
-
     public bool HasStack() => _containedStack != null;
     public void RemoveStack() => _containedStack = null;
     public InventoryStack GetStack() => _containedStack;
