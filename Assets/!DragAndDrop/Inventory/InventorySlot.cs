@@ -22,7 +22,8 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
     public void AddStack(InventoryStack item)
     {
-        if (HasStack()) Debug.LogWarning("Already contain stack.");
+        if (HasStack()) 
+            Debug.LogWarning("Already contain stack.");
 
         item.Rect.SetParent(_itemContainer);
         item.Rect.localPosition = Vector3.zero;
