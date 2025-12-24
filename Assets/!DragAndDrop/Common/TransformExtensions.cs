@@ -73,7 +73,6 @@ public static class TransformExtensions
         else
             RotateAt2D(movable, target, rotationSpeed);
 
-
         MoveTowards(movable, target, moveSpeed);
     }
 
