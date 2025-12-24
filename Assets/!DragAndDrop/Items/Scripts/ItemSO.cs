@@ -7,6 +7,7 @@ public abstract class ItemSO : ScriptableObject
     public string DisplayName;
     public Sprite Icon;
 
+
     [Header("Stacking")]
     public bool IsStackable = true;
     public int MaxStack = 64;
