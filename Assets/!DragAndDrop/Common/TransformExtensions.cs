@@ -28,7 +28,7 @@ public static class TransformExtensions
     public static void MoveTowards(this Transform movable, Vector3 target, float speed) =>
         Move(movable, target, speed);
 
-    private static void Move(Transform movable, Vector3 target, float speed) => 
+    private static void Move(Transform movable, Vector3 target, float speed) =>
         movable.position = Vector3.MoveTowards(movable.position, target, speed * Time.deltaTime);
 
     #endregion
@@ -53,6 +53,7 @@ public static class TransformExtensions
     public static void RotateAt2D(this Transform movable, Vector3 target, float rotationSpeed = 720f)
     {
         Vector3 dir = target - movable.position;
+
         if (dir.sqrMagnitude < 0.0001f)
             return;
 
