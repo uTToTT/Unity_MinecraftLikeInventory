@@ -11,6 +11,7 @@ public class PointerService
         var worldPos = _camera.ScreenToWorldPoint(screenPos);
         worldPos.z = 0;
 
+
         return worldPos;
     }
 }
