@@ -54,7 +54,6 @@ public class InventoryStack : MonoBehaviour, IDisposable
         _quantity = Mathf.Clamp(amount, 0, MaxStack);
         UpdateVisual();
 
-
         if (amount <= 0)
             OnEmpty?.Invoke(this);
     }
