@@ -27,6 +27,7 @@ public class InventoryManager : MonoBehaviour
         _addCoalButton.onClick.RemoveAllListeners();
         _addIronButton.onClick.RemoveAllListeners();
 
+
         _addCoalButton.onClick.AddListener(AddCoal);
         _addIronButton.onClick.AddListener(AddIron);
     }
