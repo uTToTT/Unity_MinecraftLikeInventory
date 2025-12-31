@@ -44,7 +44,6 @@ public class InventoryManager : MonoBehaviour
     private void SetText(Button button, string item, int amount)
     {
         var tmp = button.GetComponentInChildren<TMP_Text>();
-
         tmp.text = $"{item} +{amount.ToString()}";
     }
 
